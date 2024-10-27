@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Teste de Login e Registro</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .button {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .login-button {
+      background-color: #28a745;
+      color: #fff;
+    }
+
+    .login-button:hover {
+      background-color: #218838;
+    }
+
+    .register-button {
+      background-color: #007bff;
+      color: #fff;
+    }
+
+    .register-button:hover {
+      background-color: #0056b3;
+    }
+
+    .message {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    .form-container {
+      display: none; 
+    }
+
+    #register-se{
+      color: red;
+    }
+
+    #faca-login{
+      color: green;
+    }
+
+    #login-container{
+      margin: 30px;
+
+    }
+
+    #register-container{
+      margin: 30px;
+    }
+
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="form-container" id="login-container">
+      <h2>Login</h2>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="login-email" placeholder="Digite seu email" required />
+      </div>
+      <div class="form-group">
+        <label for="senha">Senha:</label>
+        <input type="password" id="login-senha" placeholder="Digite sua senha" required />
+      </div>
+      <button class="button login-button" onclick="login()">Entrar</button>
+      <div class="message" id="login-message"></div>
+      <p style="text-align: center;">Não tem uma conta? <span onclick="toggleForm()" id="register-se">Registre-se</span></p>
+    </div>
+
+    <div class="form-container" id="register-container">
+      <h2>Registrar</h2>
+      <div class="form-group">
+        <label for="nome">Nome:</label>
+        <input type="text" id="register-nome" placeholder="Digite seu nome" required />
+      </div>
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input type="email" id="register-email" placeholder="Digite seu email" required />
+      </div>
+      <div class="form-group">
+        <label for="senha">Senha:</label>
+        <input type="password" id="register-senha" placeholder="Digite sua senha" required />
+      </div>
+      <button class="button register-button" onclick="register()">Registrar</button>
+      <div class="message" id="register-message"></div>
+      <p style="text-align: center;">Já tem uma conta? <span onclick="toggleForm()" id="faca-login">Faça login</span></p>
+    </div>
+  </div>
+
+  <script>
+    function toggleForm() {
+      const loginContainer = document.getElementById('login-container');
+      const registerContainer = document.getElementById('register-container');
+
+      // Alternar entre os formulários de login e registro
+      if (loginContainer.style.display === 'none') {
+        loginContainer.style.display = 'block';
+        registerContainer.style.display = 'none';
+      } else {
+        loginContainer.style.display = 'none';
+        registerContainer.style.display = 'block';
+      }
+    }
+
+    async function login() {
+      const email = document.getElementById('login-email').value;
+      const senha = document.getElementById('login-senha').value;
+      const messageElement = document.getElementById('login-message');
+
+      try {
+        const response = await fetch('http://localhost:3000/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, senha }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          messageElement.textContent = 'Login realizado com sucesso!';
+          messageElement.style.color = 'green';
+          console.log('Token:', data.token);
+        } else {
+          messageElement.textContent = data.message || 'Erro ao fazer login.';
+          messageElement.style.color = 'red';
+        }
+      } catch (error) {
+        messageElement.textContent = 'Erro de conexão com o servidor.';
+        messageElement.style.color = 'red';
+        console.error('Erro:', error);
+      }
+    }
+
+    async function register() {
+      const nome = document.getElementById('register-nome').value;
+      const email = document.getElementById('register-email').value;
+      const senha = document.getElementById('register-senha').value;
+      const messageElement = document.getElementById('register-message');
+
+      try {
+        const response = await fetch('http://localhost:3000/api/register', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ nome, email, senha }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          messageElement.textContent = 'Registro realizado com sucesso!';
+          messageElement.style.color = 'green';
+        } else {
+          messageElement.textContent = data.message || 'Erro ao registrar.';
+          messageElement.style.color = 'red';
+        }
+      } catch (error) {
+        messageElement.textContent = 'Erro de conexão com o servidor.';
+        messageElement.style.color = 'red';
+        console.error('Erro:', error);
+      }
+    }
+
+    // Iniciar com o formulário de login visível
+    toggleForm();
+  </script>
+</body>
+</html>
